@@ -407,6 +407,7 @@
         // --- State ---
         let fromCurrency = "USD";
         let toCurrency = "Bs";
+        let currentRate = null;
 
         // --- Helper Functions ---
         function formatVenezuelan(num) {
@@ -431,34 +432,37 @@
             updateText.textContent = "Actualizando...";
           } else {
             updateBtn.disabled = false;
-            updateIcon.textContent = "🔄";
+            updateIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>';
             updateText.textContent = "Actualizar Tasa";
           }
         }
 
         // --- App Logic ---
-        function updateRateDisplay(rate) {
-          if (rate) {
-            rateForSwapEl.textContent = `1 USD = ${formatVenezuelan(rate)} Bs`;
-          } else {
-            rateForSwapEl.textContent = "--";
+        function calculate() {
+          if (!currentRate) {
+            conversionResult.textContent = formatVenezuelan(0);
+            return;
           }
-        }
-
-        async function calculate() {
           const value = parseFloat(amountInput.value);
           if (isNaN(value) || value < 0) {
             conversionResult.textContent = formatVenezuelan(0);
             return;
           }
-          const endpoint = fromCurrency === "USD" ? "to-bs" : "to-usd";
-          const param = fromCurrency === "USD" ? "usd" : "bs";
-          try {
-            const response = await fetch(`/api/${endpoint}?${param}=${value}`);
-            const data = await response.json();
-            conversionResult.textContent = formatVenezuelan(data.converted);
-          } catch {
-            conversionResult.textContent = "Error";
+
+          let converted;
+          if (fromCurrency === 'USD') {
+            converted = value * currentRate;
+          } else {
+            converted = value / currentRate;
+          }
+          conversionResult.textContent = formatVenezuelan(converted);
+        }
+
+        function updateRateDisplay(rate) {
+          if (rate) {
+            rateForSwapEl.textContent = `1 USD = ${formatVenezuelan(rate)} Bs`;
+          } else {
+            rateForSwapEl.textContent = "--";
           }
         }
 
@@ -471,6 +475,15 @@
           calculate();
         }
 
+        function copyResult() {
+          const resultText = conversionResult.textContent;
+          navigator.clipboard.writeText(resultText).then(() => {
+            showNotification(`Copiado: ${resultText}`);
+          }, () => {
+            showNotification("Error al copiar");
+          });
+        }
+
         async function fetchAndUpdateRate(isManualUpdate = false) {
           if (isManualUpdate) {
             setButtonLoading(true);
@@ -478,10 +491,13 @@
           try {
             const response = await fetch("/api/rate");
             const data = await response.json();
+            currentRate = data.value; // Store the rate
+
             currentRateEl.textContent = formatVenezuelan(data.value) + " Bs";
             lastUpdateEl.textContent = `Actualizado: ${data.last_updated}`;
             updateRateDisplay(data.value);
-            calculate(); // Recalculate in case a value is already entered
+            calculate(); // Recalculate with the new rate
+
             if (isManualUpdate) {
               showNotification("Tasa actualizada correctamente");
             }

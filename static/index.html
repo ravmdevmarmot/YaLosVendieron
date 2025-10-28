@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YaLosVendieron</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#181c20">
+    <link rel="icon" sizes="192x192" href="/icon-192.png">
+    <link rel="icon" sizes="512x512" href="/icon-512.png">
+        <style>
+          :root {
+            --background-color: #121212;
+            --card-color: #1E1E1E;
+            --border-color: #424242;
+            --text-primary: #E0E0E0;
+            --text-secondary: #8E8E93;
+            --accent-color: #007AFF;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+          }
+    
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+    
+          body {
+            font-family: var(--font-family);
+            background: var(--background-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+          }
+    
+          .container {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 0;
+            background: transparent;
+          }
+    
+          .header {
+            text-align: center;
+            margin-bottom: 32px;
+          }
+          .header h1 {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+          }
+          .header .subtitle {
+            font-size: 1em;
+            color: var(--text-secondary);
+            font-weight: 400;
+          }
+    
+          .main-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+          }
+    
+          .card {
+            background: var(--card-color);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+          }
+          
+          .card-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+    
+          .rate-display {
+            text-align: center;
+            margin-bottom: 16px;
+          }
+          .rate-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+          }
+          .rate-info {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+          }
+          
+          .update-btn {
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+          }
+          .update-btn:hover {
+            background-color: #0056b3;
+          }
+          .update-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+    
+          .converter-section {
+            position: relative;
+          }
+    
+          .currency-row {
+            background: var(--background-color);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            transition: border-color 0.2s;
+          }
+          .currency-row:focus-within {
+            border-color: var(--accent-color);
+          }
+    
+          .currency-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+          }
+          .currency-info .currency-name {
+            font-weight: 600;
+            color: var(--text-primary);
+          }
+    
+          .currency-row input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 2em;
+            font-weight: 600;
+            padding: 0;
+            outline: none;
+          }
+          /* Hide number input arrows */
+          input[type=number]::-webkit-inner-spin-button, 
+          input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+          }
+          input[type=number] {
+            -moz-appearance: textfield;
+          }
+    
+          .swap-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 8px 0;
+          }
+    
+          .swap-btn {
+            background: var(--card-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, background-color 0.2s;
+          }
+          .swap-btn:hover {
+            transform: rotate(180deg);
+            background-color: var(--border-color);
+          }
+    
+          .result-value-container {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            font-size: 2em;
+            font-weight: 600;
+            color: var(--text-primary);
+            padding: 16px;
+            border-radius: 12px;
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+          }
+    
+          .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 8px;
+            transition: color 0.2s, background-color 0.2s;
+          }
+          .copy-btn:hover {
+            color: var(--accent-color);
+            background-color: var(--border-color);
+          }
+    
+          .footer {
+            text-align: center;
+            padding: 24px 0;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+          }
+          .footer-warning {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+          }
+                .footer-disclaimer {
+                  font-size: 0.9em;
+                  opacity: 0.8;
+                }
+          
+                .author-link {
+                  color: var(--text-primary);
+                  text-decoration: none;
+                  transition: color 0.2s;
+                }
+                .author-link:hover {
+                  color: var(--accent-color);
+                }    
+          .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+          }
+    
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+    
+          .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 18px;
+            background: var(--card-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 1000;
+          }
+          .notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+          }
+    
+          .card-enter {
+            animation: cardSlideIn 0.5s ease-out;
+          }
+    
+          @keyframes cardSlideIn {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+    
+          .flotante {
+            display:scroll;
+            position:fixed;
+            bottom:320px;
+            right:0px;
+          }
+        </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>YaLosVendieron</h1>
+        <p class="subtitle">Calculadora y Monitor de Tasas</p>
+        
+      </header>
+
+      <div class="main-grid">
+        <!-- Sección de Tasa Actual -->
+        <div class="card">
+          <h2 class="card-title">
+            <span>📊</span>
+            Tasa Actual
+          </h2>
+          
+          <div class="rate-display pulse">
+            <div class="rate-value" id="currentRate"></div>
+            <div class="rate-info">
+              <div>Presione Actualizar Tasa para ver el Valor<span id="rateInBs"></span></div>
+              <div id="lastUpdate"></div>
+            </div>
+          </div>
+          <button class="update-btn" id="updateBtn">
+            <span id="updateIcon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span>
+            <span id="updateText">Actualizar Tasa</span>
+          </button>
+          
+        </div>
+
+        <!-- Calculadora -->
+        <div class="card">
+          <h2 class="card-title">
+            <span>🔢</span>
+            Calculadora
+          </h2>
+          <div class="converter-section">
+            <div class="currency-row" id="from-currency-row">
+              <div class="currency-info">
+                <label for="amountInput">Ingrese la cantidad en</label>
+                <span class="currency-name" id="fromCurrency">USD</span>
+              </div>
+              <input type="number" id="amountInput" placeholder="100" />
+            </div>
+
+            <div class="swap-container">
+              <button id="swapBtn" class="swap-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+              </button>
+              <div class="rate-info-small" id="rate-for-swap"></div>
+            </div>
+
+            <div class="currency-row result" id="to-currency-row">
+              <div class="currency-info">
+                <label>Al cambio serían</label>
+                <span class="currency-name" id="toCurrency">Bs</span>
+              </div>
+              <div class="result-value-container">
+                <span id="conversionResult">0,00</span>
+                <button id="copyBtn" class="copy-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="footer-disclaimer">
+          Esta aplicación muestra valores oficiales directamente de la pagina https://www.bcv.org.ve/
+          <p>Le sugerimos revisar de igual forma la pagina oficial </p>
+        </div>
+        <p style="margin-top: 16px;">© 2025 <a href="https://linktr.ee/DevMarmot" target="_blank" rel="noopener noreferrer" class="author-link">DevMarmot (Rayner Vasquez)</a>. Todos los derechos reservados.</p>
+      </footer>
+      <button id="shareBtn" class="flotante" title="Compartir" style="background: linear-gradient(90deg, #4fc3f7 0%, #1976d2 100%); color: #fff; border: none; border-radius: 50%; width: 56px; height: 56px; box-shadow: 0 2px 8px rgba(33,150,243,0.18); position: fixed; bottom: 32px; right: 24px; display: flex; align-items: center; justify-content: center; font-size: 2em; cursor: pointer; z-index: 1001;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      </button>
+    </div>
+
+    <!-- Notificación -->
+    <div class="notification" id="notification">
+      <span id="notificationText">Tasa actualizada correctamente</span>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- DOM Elements ---
+        const shareBtn = document.getElementById('shareBtn');
+        const updateBtn = document.getElementById("updateBtn");
+        const amountInput = document.getElementById("amountInput");
+        const conversionResult = document.getElementById("conversionResult");
+        const fromCurrencyEl = document.getElementById("fromCurrency");
+        const toCurrencyEl = document.getElementById("toCurrency");
+        const swapBtn = document.getElementById("swapBtn");
+        const copyBtn = document.getElementById("copyBtn");
+        const rateForSwapEl = document.getElementById("rate-for-swap");
+        const notification = document.getElementById("notification");
+        const notificationText = document.getElementById("notificationText");
+        const currentRateEl = document.getElementById("currentRate");
+        const lastUpdateEl = document.getElementById("lastUpdate");
+        const updateIcon = document.getElementById("updateIcon");
+        const updateText = document.getElementById("updateText");
+
+        // --- State ---
+        let fromCurrency = "USD";
+        let toCurrency = "Bs";
+
+        // --- Helper Functions ---
+        function formatVenezuelan(num) {
+          if (typeof num !== "number" || isNaN(num)) return "0,00";
+          let [entero, decimal] = num.toFixed(2).split(".");
+          entero = entero.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+          return `${entero},${decimal}`;
+        }
+
+        function showNotification(message) {
+          notificationText.textContent = message;
+          notification.classList.add("show");
+          setTimeout(() => {
+            notification.classList.remove("show");
+          }, 3000);
+        }
+
+        function setButtonLoading(loading) {
+          if (loading) {
+            updateBtn.disabled = true;
+            updateIcon.innerHTML = '<div class="loading-spinner"></div>';
+            updateText.textContent = "Actualizando...";
+          } else {
+            updateBtn.disabled = false;
+            updateIcon.textContent = "🔄";
+            updateText.textContent = "Actualizar Tasa";
+          }
+        }
+
+        // --- App Logic ---
+        function updateRateDisplay(rate) {
+          if (rate) {
+            rateForSwapEl.textContent = `1 USD = ${formatVenezuelan(rate)} Bs`;
+          } else {
+            rateForSwapEl.textContent = "--";
+          }
+        }
+
+        async function calculate() {
+          const value = parseFloat(amountInput.value);
+          if (isNaN(value) || value < 0) {
+            conversionResult.textContent = formatVenezuelan(0);
+            return;
+          }
+          const endpoint = fromCurrency === "USD" ? "to-bs" : "to-usd";
+          const param = fromCurrency === "USD" ? "usd" : "bs";
+          try {
+            const response = await fetch(`/api/${endpoint}?${param}=${value}`);
+            const data = await response.json();
+            conversionResult.textContent = formatVenezuelan(data.converted);
+          } catch {
+            conversionResult.textContent = "Error";
+          }
+        }
+
+        function swapCurrencies() {
+          [fromCurrency, toCurrency] = [toCurrency, fromCurrency];
+          [fromCurrencyEl.textContent, toCurrencyEl.textContent] = [toCurrencyEl.textContent, fromCurrencyEl.textContent];
+          const resultValueStr = conversionResult.textContent.replace(/\./g, '').replace(',', '.');
+          const resultValue = parseFloat(resultValueStr);
+          amountInput.value = isNaN(resultValue) ? '' : resultValue;
+          calculate();
+        }
+
+        async function fetchAndUpdateRate(isManualUpdate = false) {
+          if (isManualUpdate) {
+            setButtonLoading(true);
+          }
+          try {
+            const response = await fetch("/api/rate");
+            const data = await response.json();
+            currentRateEl.textContent = formatVenezuelan(data.value) + " Bs";
+            lastUpdateEl.textContent = `Actualizado: ${data.last_updated}`;
+            updateRateDisplay(data.value);
+            calculate(); // Recalculate in case a value is already entered
+            if (isManualUpdate) {
+              showNotification("Tasa actualizada correctamente");
+            }
+          } catch (error) {
+            if (isManualUpdate) {
+              showNotification("Error al obtener la tasa");
+            }
+            console.error(error);
+          }
+          if (isManualUpdate) {
+            setButtonLoading(false);
+          }
+        }
+
+        // --- Initial Setup ---
+        
+        // Event Listeners
+        shareBtn.addEventListener('click', () => {
+          const shareUrl = 'https://yalosvendieron.onrender.com/';
+          if (navigator.share) {
+            navigator.share({ title: 'YaLosVendieron', text: 'Calculadora y Monitor de Tasas USD/Bs', url: shareUrl });
+          } else {
+            navigator.clipboard.writeText(shareUrl).then(() => showNotification('Enlace copiado para compartir'), () => showNotification('No se pudo copiar el enlace'));
+          }
+        });
+
+        updateBtn.addEventListener("click", () => fetchAndUpdateRate(true));
+        swapBtn.addEventListener("click", swapCurrencies);
+        copyBtn.addEventListener("click", copyResult);
+        amountInput.addEventListener("input", calculate);
+
+        // PWA Service Worker
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js').catch(err => console.log('Service worker registration failed', err));
+          });
+        }
+
+        // Initial Animations
+        const cards = document.querySelectorAll(".card");
+        cards.forEach((card, index) => {
+          setTimeout(() => card.classList.add("card-enter"), index * 200);
+        });
+        const rateDisplay = document.querySelector(".rate-display");
+        // rateDisplay.classList.add("glow-effect"); // Removed for minimalist design
+
+        // Fetch initial rate on page load
+        fetchAndUpdateRate();
+      });
+    </script>
+  </body>
+</html>
